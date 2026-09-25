@@ -1,0 +1,508 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="ja" xml:lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>自然言語と時系列処理</title>
+<meta name="author" content="Hirotaka Niitsuma" />
+<meta name="generator" content="Org Mode" />
+<style>
+  #content { max-width: 60em; margin: auto; }
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #e6e6e6;
+    border-radius: 3px;
+    background-color: #f2f2f2;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: auto;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    top: -8px;
+    right: 12px;
+    padding: 3px;
+    color: #555;
+    background-color: #f2f2f299;
+  }
+  pre.src:hover:before { display: inline; margin-top: 14px;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-authinfo::before { content: 'Authinfo'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { }
+</style>
+<link rel="stylesheet" type="text/css" href="pub/css/text.css" /><script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+</head>
+<body>
+<div id="org-div-home-and-up">
+ <a accesskey="h" href="index.html"> UP </a>
+ |
+ <a accesskey="H" href="index.html"> HOME </a>
+</div><div id="content" class="content">
+<h1 class="title">自然言語と時系列処理</h1>
+<div id="table-of-contents" role="doc-toc">
+<h2>&#30446;&#27425;</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#org9e37375">1. 準備</a></li>
+<li><a href="#orgcc38297">2. bskyの分析</a></li>
+<li><a href="#org37117c2">3. doc2vecについて</a></li>
+<li><a href="#org525b771">4. 演習</a></li>
+<li><a href="#org1afcde4">5. 課題</a></li>
+</ul>
+</div>
+</div>
+
+
+<div id="outline-container-org9e37375" class="outline-2">
+<h2 id="org9e37375"><span class="section-number-2">1.</span> 準備</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+以下の実験ではSNSのデータ取得を行うので
+</p>
+
+<p>
+<a href="https://bsky.app">https://bsky.app</a>
+</p>
+
+<p>
+のアカウントを各自で取得してください。
+</p>
+</div>
+</div>
+
+
+<div id="outline-container-orgcc38297" class="outline-2">
+<h2 id="orgcc38297"><span class="section-number-2">2.</span> bskyの分析</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+以下の例はbskyの
+「日銀」
+というキーワードを含む投稿を一週間ごとに集計して、
+Doc2vecと呼ばれる手法で数値ベクトルに変換している。
+このベクトル列ニューラルネットワーク（LSTMなど）に入力すれば、もっと高い精度でグーグルトレンドや株価などの時系列データの予測が可能となる。
+</p>
+
+
+<p>
+<a href="dyn/examples/bsky2vec.py">dyn/examples/bsky2vec.py</a>
+</p>
+<div class="org-src-container">
+<pre class="src src-python"><span class="linenr">  1: </span># pip3 install atproto python-dateutil fugashi --break-system-packages
+<span class="linenr">  2: </span>
+<span class="linenr">  3: </span>import re
+<span class="linenr">  4: </span>import numpy  as np
+<span class="linenr">  5: </span>import pandas as pd
+<span class="linenr">  6: </span>
+<span class="linenr">  7: </span>from datetime import datetime, timezone, timedelta
+<span class="linenr">  8: </span>from dateutil.relativedelta import relativedelta
+<span class="linenr">  9: </span>from atproto import Client
+<span class="linenr"> 10: </span>from atproto_client.models.app.bsky.feed.search_posts import Params
+<span class="linenr"> 11: </span>
+<span class="linenr"> 12: </span>from gensim.models.doc2vec import Doc2Vec, TaggedDocument
+<span class="linenr"> 13: </span>
+<span class="linenr"> 14: </span>
+<span class="linenr"> 15: </span>
+<span class="linenr"> 16: </span>
+<span class="linenr"> 17: </span>ACOUNT='xxxxx@omu.ac.jp'
+<span class="linenr"> 18: </span>PASSWD='passwd'
+<span class="linenr"> 19: </span>KWD='日銀'
+<span class="linenr"> 20: </span>
+<span class="linenr"> 21: </span>
+<span class="linenr"> 22: </span>
+<span class="linenr"> 23: </span>def search_posts(
+<span class="linenr"> 24: </span>        query: str,
+<span class="linenr"> 25: </span>        since_date: str, until_date: str ,
+<span class="linenr"> 26: </span>        email: str, app_password: str,
+<span class="linenr"> 27: </span>        per_page: int = 100, max_pages: int = 50,
+<span class="linenr"> 28: </span>):
+<span class="linenr"> 29: </span>
+<span class="linenr"> 30: </span>    client = Client()
+<span class="linenr"> 31: </span>    client.login(email, app_password)
+<span class="linenr"> 32: </span>
+<span class="linenr"> 33: </span>    cursor = None
+<span class="linenr"> 34: </span>    results = []
+<span class="linenr"> 35: </span>    for _ in range(max_pages):
+<span class="linenr"> 36: </span>        params = Params(q=query, limit=per_page, cursor=cursor,
+<span class="linenr"> 37: </span>                        since=since_date, until=until_date)
+<span class="linenr"> 38: </span>        res = client.app.bsky.feed.search_posts(params=params)
+<span class="linenr"> 39: </span>        posts = res.posts or []
+<span class="linenr"> 40: </span>        results.extend(posts)
+<span class="linenr"> 41: </span>        cursor = getattr(res, "cursor", None)
+<span class="linenr"> 42: </span>        if not cursor or not posts:
+<span class="linenr"> 43: </span>            break
+<span class="linenr"> 44: </span>    return results
+<span class="linenr"> 45: </span>
+<span class="linenr"> 46: </span>def posts_to_df(posts):
+<span class="linenr"> 47: </span>    rows = []
+<span class="linenr"> 48: </span>    for p in posts:
+<span class="linenr"> 49: </span>        record = getattr(p, "record", {}) or {}
+<span class="linenr"> 50: </span>        text = getattr(record, "text", None) or record.get("text", "")
+<span class="linenr"> 51: </span>        created_at = getattr(record, "created_at", None) or record.get("createdAt")
+<span class="linenr"> 52: </span>
+<span class="linenr"> 53: </span>        if created_at:
+<span class="linenr"> 54: </span>            # createdAt は ISO 8601 文字列
+<span class="linenr"> 55: </span>            dt = datetime.fromisoformat(created_at.replace("Z", "+00:00"))
+<span class="linenr"> 56: </span>            ts = int(dt.timestamp())  # Unix time (秒)
+<span class="linenr"> 57: </span>        else:
+<span class="linenr"> 58: </span>            ts = None
+<span class="linenr"> 59: </span>
+<span class="linenr"> 60: </span>        rows.append({
+<span class="linenr"> 61: </span>            "unixtime": ts,
+<span class="linenr"> 62: </span>            "uri": getattr(p, "uri", None),
+<span class="linenr"> 63: </span>            "handle": getattr(getattr(p, "author", None), "handle", None),
+<span class="linenr"> 64: </span>            "text": text,
+<span class="linenr"> 65: </span>        })
+<span class="linenr"> 66: </span>
+<span class="linenr"> 67: </span>    df = pd.DataFrame(rows).dropna(subset=["unixtime"])
+<span class="linenr"> 68: </span>    df = df.set_index("unixtime").sort_index()
+<span class="linenr"> 69: </span>    return df
+<span class="linenr"> 70: </span>
+<span class="linenr"> 71: </span>
+<span class="linenr"> 72: </span># --- 1) クリーニング &amp; トークナイズ ----------------------------
+<span class="linenr"> 73: </span>def clean_text(s: str) -&gt; str:
+<span class="linenr"> 74: </span>    if not isinstance(s, str):
+<span class="linenr"> 75: </span>        return ""
+<span class="linenr"> 76: </span>    s = s.lower()
+<span class="linenr"> 77: </span>    s = re.sub(r'https?://\S+', ' ', s)       # URL除去
+<span class="linenr"> 78: </span>    s = re.sub(r'@[A-Za-z0-9_\.]+', ' ', s)   # @mention簡易除去
+<span class="linenr"> 79: </span>    s = re.sub(r'\s+', ' ', s).strip()
+<span class="linenr"> 80: </span>    return s
+<span class="linenr"> 81: </span>
+<span class="linenr"> 82: </span>def _tokenize_with_fugashi(text: str):
+<span class="linenr"> 83: </span>    try:
+<span class="linenr"> 84: </span>        from fugashi import Tagger
+<span class="linenr"> 85: </span>        tagger = Tagger()
+<span class="linenr"> 86: </span>        return [w.surface for w in tagger(text)]
+<span class="linenr"> 87: </span>    except Exception:
+<span class="linenr"> 88: </span>        return None  # 失敗時はフォールバックへ
+<span class="linenr"> 89: </span>
+<span class="linenr"> 90: </span>def _tokenize_fallback(text: str):
+<span class="linenr"> 91: </span>    # 日本語（空白が少ない）なら文字2-gram、英数混在なら空白split
+<span class="linenr"> 92: </span>    if ' ' not in text:
+<span class="linenr"> 93: </span>        chars = [c for c in re.sub(r'\s+', '', text)]
+<span class="linenr"> 94: </span>        return [a+b for a, b in zip(chars, chars[1:])] or chars
+<span class="linenr"> 95: </span>    else:
+<span class="linenr"> 96: </span>        return re.findall(r"[A-Za-z0-9_#@]+|[一-龥ぁ-んァ-ヶー]+", text)
+<span class="linenr"> 97: </span>
+<span class="linenr"> 98: </span>def tokenize(text: str):
+<span class="linenr"> 99: </span>    text = clean_text(text)
+<span class="linenr">100: </span>    toks = _tokenize_with_fugashi(text)
+<span class="linenr">101: </span>    return toks if toks else _tokenize_fallback(text)
+<span class="linenr">102: </span>
+<span class="linenr">103: </span># --- 2) 週（JST）にまとめて TaggedDocument 化 -------------------
+<span class="linenr">104: </span>def make_weekly_documents(df: pd.DataFrame,
+<span class="linenr">105: </span>                          text_col: str = "text",
+<span class="linenr">106: </span>                          jst: bool = True,
+<span class="linenr">107: </span>                          rule: str = "W-MON"):
+<span class="linenr">108: </span>    """
+<span class="linenr">109: </span>    df: index=unixtime(秒) の DataFrame を想定。textカラム必須。
+<span class="linenr">110: </span>    jst=TrueならJST(UTC+9)に変換して週集計（rule=W-MON: 月曜始まり）
+<span class="linenr">111: </span>    """
+<span class="linenr">112: </span>    assert text_col in df.columns, f"'{text_col}' column not found"
+<span class="linenr">113: </span>    s = df[text_col].fillna("").astype(str)
+<span class="linenr">114: </span>
+<span class="linenr">115: </span>    # index(unixtime秒) → datetime（UTC）
+<span class="linenr">116: </span>    dt_utc = pd.to_datetime(df.index, unit="s", utc=True)
+<span class="linenr">117: </span>    if jst:
+<span class="linenr">118: </span>        tz = timezone(timedelta(hours=9))
+<span class="linenr">119: </span>        dt = dt_utc.tz_convert(tz)
+<span class="linenr">120: </span>    else:
+<span class="linenr">121: </span>        dt = dt_utc
+<span class="linenr">122: </span>
+<span class="linenr">123: </span>    tmp = pd.DataFrame({"text": s, "dt": dt})
+<span class="linenr">124: </span>    # 週ごとにテキスト結合
+<span class="linenr">125: </span>    weekly = tmp.resample(rule, on="dt")["text"].apply(lambda x: "\n".join(x)).dropna()
+<span class="linenr">126: </span>    # 週の代表日時（期首）を index に
+<span class="linenr">127: </span>    weekly.index.name = "week_start"
+<span class="linenr">128: </span>
+<span class="linenr">129: </span>    # TaggedDocument 化
+<span class="linenr">130: </span>    docs = []
+<span class="linenr">131: </span>    tags = []
+<span class="linenr">132: </span>    for ws, text in weekly.items():
+<span class="linenr">133: </span>        tokens = tokenize(text)
+<span class="linenr">134: </span>        tag = f"week_{ws.strftime('%Y-%m-%d')}"
+<span class="linenr">135: </span>        docs.append(TaggedDocument(words=tokens, tags=[tag]))
+<span class="linenr">136: </span>        tags.append((ws, tag))
+<span class="linenr">137: </span>    return docs, tags  # tags: [(Timestamp, "week_YYYY-MM-DD"), ...]
+<span class="linenr">138: </span>
+<span class="linenr">139: </span># --- 3) Doc2Vec を訓練 → 週ベクトルの DataFrame -----------------
+<span class="linenr">140: </span>def train_doc2vec_and_vectorize(docs,
+<span class="linenr">141: </span>                                vector_size: int = 128,
+<span class="linenr">142: </span>                                window: int = 10,
+<span class="linenr">143: </span>                                min_count: int = 2,
+<span class="linenr">144: </span>                                epochs: int = 40,
+<span class="linenr">145: </span>                                dm: int = 1,
+<span class="linenr">146: </span>                                seed: int = 42):
+<span class="linenr">147: </span>    model = Doc2Vec(vector_size=vector_size,
+<span class="linenr">148: </span>                    window=window,
+<span class="linenr">149: </span>                    min_count=min_count,
+<span class="linenr">150: </span>                    workers=4,
+<span class="linenr">151: </span>                    epochs=epochs,
+<span class="linenr">152: </span>                    dm=dm,
+<span class="linenr">153: </span>                    seed=seed)
+<span class="linenr">154: </span>    model.build_vocab(docs)
+<span class="linenr">155: </span>    model.train(docs, total_examples=len(docs), epochs=model.epochs)
+<span class="linenr">156: </span>    return model
+<span class="linenr">157: </span>
+<span class="linenr">158: </span>def weekly_vectors_df(model: Doc2Vec, tags):
+<span class="linenr">159: </span>    # tags: [(week_start_ts, "week_YYYY-MM-DD"), ...]
+<span class="linenr">160: </span>    rows = []
+<span class="linenr">161: </span>    index = []
+<span class="linenr">162: </span>    for ws, tag in tags:
+<span class="linenr">163: </span>        vec = model.dv[tag]  # 学習済み → 直接取り出し
+<span class="linenr">164: </span>        rows.append(vec)
+<span class="linenr">165: </span>        index.append(ws)
+<span class="linenr">166: </span>    mat = np.vstack(rows) if rows else np.zeros((0, model.vector_size))
+<span class="linenr">167: </span>    dfv = pd.DataFrame(mat, index=pd.DatetimeIndex(index, name="week_start"))
+<span class="linenr">168: </span>    return dfv.sort_index()
+<span class="linenr">169: </span>
+<span class="linenr">170: </span># --- 4) 使い方（例） -------------------------------------------
+<span class="linenr">171: </span>
+<span class="linenr">172: </span>since_date='2024-07-31T15:00:00Z'
+<span class="linenr">173: </span>until_date='2025-08-31T15:00:00Z'
+<span class="linenr">174: </span>
+<span class="linenr">175: </span>posts = search_posts(
+<span class="linenr">176: </span>    KWD,
+<span class="linenr">177: </span>    since_date,
+<span class="linenr">178: </span>    until_date,
+<span class="linenr">179: </span>    ACOUNT,
+<span class="linenr">180: </span>    PASSWD,
+<span class="linenr">181: </span>    100, 50,
+<span class="linenr">182: </span>)
+<span class="linenr">183: </span># for p in posts:
+<span class="linenr">184: </span>#     print(p.uri, p.author.handle, getattr(p.record, "text", ""))
+<span class="linenr">185: </span>
+<span class="linenr">186: </span>
+<span class="linenr">187: </span>posts_df = posts_to_df(posts)
+<span class="linenr">188: </span>#print(posts_df.head())
+<span class="linenr">189: </span>print(posts_df)
+<span class="linenr">190: </span>
+<span class="linenr">191: </span>
+<span class="linenr">192: </span>
+<span class="linenr">193: </span># posts_df は「unixtime を index」「text カラム」を持つ DataFrame を想定
+<span class="linenr">194: </span># posts_df = posts_to_df(posts)  # 以前作った関数がある場合
+<span class="linenr">195: </span>
+<span class="linenr">196: </span>docs, tags = make_weekly_documents(posts_df, text_col="text", jst=True, rule="W-MON")
+<span class="linenr">197: </span>model = train_doc2vec_and_vectorize(docs, vector_size=128, window=10, min_count=2, epochs=40, dm=1)
+<span class="linenr">198: </span>vecdf = weekly_vectors_df(model, tags)
+<span class="linenr">199: </span>print(vecdf.shape)   # (週数, 128)
+<span class="linenr">200: </span>print(vecdf.head())  # 週ごとの特徴ベクトル（時系列）
+</pre>
+</div>
+</div>
+</div>
+
+
+
+
+<div id="outline-container-org37117c2" class="outline-2">
+<h2 id="org37117c2"><span class="section-number-2">3.</span> doc2vecについて</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+<a href="https://deepage.net/machine_learning/2017/01/08/doc2vec.html">https://deepage.net/machine_learning/2017/01/08/doc2vec.html</a>
+</p>
+
+
+<div id="orgb2c170b" class="figure">
+<p><img src="dmpv.png" alt="dmpv.png" width="80%" />
+</p>
+<p><span class="figure-number">&#22259;1:  </span>doc2vec</p>
+</div>
+</div>
+</div>
+
+
+
+<div id="outline-container-org525b771" class="outline-2">
+<h2 id="org525b771"><span class="section-number-2">4.</span> 演習</h2>
+<div class="outline-text-2" id="text-4">
+<ul class="org-ul">
+<li>自分が興味ある単語のについてbskyの投稿を取得してみよう</li>
+<li>取得した特徴をDoc2vecで数値にしてみよう</li>
+<li>ここでは週ごとにまとめているが日ごとにまとめることもできる。マイナーな単語ではなく、必ず誰かが毎日投稿するようなキーワードにして、日毎にベクトルを計算してみよう</li>
+<li>Unix time とJSTの関係を調べてみよう。このプログラムでは、どこでその処理を行っているか確認せよ</li>
+</ul>
+</div>
+</div>
+
+
+<div id="outline-container-org1afcde4" class="outline-2">
+<h2 id="org1afcde4"><span class="section-number-2">5.</span> 課題</h2>
+<div class="outline-text-2" id="text-5">
+<ul class="org-ul">
+<li>自分が興味ある単語のについてbskyの投稿を取得して、そのベクトル表現からgoogleトレンドや株価などの時系列変化を予測するニューラルネットワーク（できれだけLSTMで）を作れ。</li>
+<li>そのニューラルネットワークの計算結果から何がわかるか考察せよ</li>
+</ul>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="author">&#33879;&#32773;: Hirotaka Niitsuma</p>
+<p class="email">Email: <a href="mailto:hirotakaniitsuma@omu.ac.jp">hirotakaniitsuma@omu.ac.jp</a></p>
+<p class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 29.1 (<a href="https://orgmode.org">Org</a> mode 9.6.6)</p>
+<p class="validation"><a href="https://validator.w3.org/check?uri=referer">Validate</a></p>
+</div>
+</body>
+</html>

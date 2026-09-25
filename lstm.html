@@ -1,0 +1,731 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="ja" xml:lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>LSTMと時系列データ処理</title>
+<meta name="author" content="Hirotaka Niitsuma" />
+<meta name="generator" content="Org Mode" />
+<style>
+  #content { max-width: 60em; margin: auto; }
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #e6e6e6;
+    border-radius: 3px;
+    background-color: #f2f2f2;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: auto;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    top: -8px;
+    right: 12px;
+    padding: 3px;
+    color: #555;
+    background-color: #f2f2f299;
+  }
+  pre.src:hover:before { display: inline; margin-top: 14px;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-authinfo::before { content: 'Authinfo'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { }
+</style>
+<link rel="stylesheet" type="text/css" href="pub/css/text.css" /><script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+</head>
+<body>
+<div id="org-div-home-and-up">
+ <a accesskey="h" href="index.html"> UP </a>
+ |
+ <a accesskey="H" href="index.html"> HOME </a>
+</div><div id="content" class="content">
+<h1 class="title">LSTMと時系列データ処理</h1>
+<div id="table-of-contents" role="doc-toc">
+<h2>&#30446;&#27425;</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#orged39c75">1. python基本文法</a></li>
+<li><a href="#org773c45a">2. リカレントニューラルネットワーク</a>
+<ul>
+<li><a href="#org95b733a">BPTT(Backpropagation Through Time)とは</a></li>
+</ul>
+</li>
+<li><a href="#org1312c36">3. sin関数をニューラルネットに学習させてみる</a></li>
+<li><a href="#org2bcba51">4. googleトレンドをニューラルネットに学習させてみる</a></li>
+<li><a href="#org7e19a6c">5. ラグ特徴のコピー現象</a></li>
+<li><a href="#orgffe02f8">6. 演習</a></li>
+<li><a href="#org929da27">7. 課題</a></li>
+<li><a href="#org2540643">8. 発展課題</a></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-orged39c75" class="outline-2">
+<h2 id="orged39c75"><span class="section-number-2">1.</span> python基本文法</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+時系列データの多くはpandasというライブラリを使って扱われる
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="linenr"> 1: </span># pip3 install pandas
+<span class="linenr"> 2: </span>import pandas as pd
+<span class="linenr"> 3: </span>
+<span class="linenr"> 4: </span># 辞書からDataFrameを作成
+<span class="linenr"> 5: </span>data = {
+<span class="linenr"> 6: </span>    "名前": ["Alice", "Bob", "Charlie", "David"],
+<span class="linenr"> 7: </span>    "年齢": [24, 30, 18, 35],
+<span class="linenr"> 8: </span>    "点数": [85, 92, 78, 88]
+<span class="linenr"> 9: </span>}
+<span class="linenr">10: </span>
+<span class="linenr">11: </span>df = pd.DataFrame(data)
+<span class="linenr">12: </span>print(df)
+<span class="linenr">13: </span>
+<span class="linenr">14: </span>#      名前  年齢  点数
+<span class="linenr">15: </span>#0   Alice  24  85
+<span class="linenr">16: </span>#1     Bob  30  92
+<span class="linenr">17: </span>#2  Charlie  18  78
+<span class="linenr">18: </span>#3   David  35  88
+</pre>
+</div>
+
+
+<p>
+sin波をpandasのデータとして格納
+</p>
+<div class="org-src-container">
+<pre class="src src-python"><span class="linenr"> 1: </span>import numpy as np
+<span class="linenr"> 2: </span>import pandas as pd
+<span class="linenr"> 3: </span>time = np.arange(0, 200, 0.1)
+<span class="linenr"> 4: </span>data = np.sin(time) + 0.1 * np.random.randn(len(time))  # sin波+ノイズ
+<span class="linenr"> 5: </span>
+<span class="linenr"> 6: </span>df = pd.DataFrame({"time": time, "value": data})
+<span class="linenr"> 7: </span>df.set_index("time", inplace=True)
+<span class="linenr"> 8: </span>
+<span class="linenr"> 9: </span>import matplotlib.pyplot as plt
+<span class="linenr">10: </span>df.plot()
+<span class="linenr">11: </span>plt.show()
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-org773c45a" class="outline-2">
+<h2 id="org773c45a"><span class="section-number-2">2.</span> リカレントニューラルネットワーク</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+リカレントニューラルネットワーク(RNN)
+</p>
+
+
+<div id="org11ab662" class="figure">
+<p><img src="rnn_diagram.png" alt="rnn_diagram.png" width="90%" />
+</p>
+<p><span class="figure-number">&#22259;1:  </span>RNN の時間展開と BPTT のイメージ</p>
+</div>
+</div>
+
+<div id="outline-container-org95b733a" class="outline-3">
+<h3 id="org95b733a">BPTT(Backpropagation Through Time)とは</h3>
+<div class="outline-text-3" id="text-org95b733a">
+<p>
+<a href="https://xexeq.jp/blogs/media/it-glossary234">BPTTとは、リカレントニューラルネットワーク（RNN）の学習アルゴリズムです。時系列データの処理に適した手法で、過去の情報を考慮しながら現在の出力を計算します。BPTTは通常の誤差逆伝播法を時間方向に拡張したものであり、RNNの重みを効率的に更新できます。</a>
+</p>
+</div>
+</div>
+</div>
+
+
+
+<div id="outline-container-org1312c36" class="outline-2">
+<h2 id="org1312c36"><span class="section-number-2">3.</span> sin関数をニューラルネットに学習させてみる</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+<a href="dyn/examples/lstmsin.py">dyn/examples/lstmsin.py</a>
+</p>
+<div class="org-src-container">
+<pre class="src src-python"><span class="linenr"> 1: </span>import numpy as np
+<span class="linenr"> 2: </span>import pandas as pd
+<span class="linenr"> 3: </span>import torch
+<span class="linenr"> 4: </span>import torch.nn as nn
+<span class="linenr"> 5: </span>from torch.utils.data import Dataset, DataLoader
+<span class="linenr"> 6: </span>import matplotlib.pyplot as plt
+<span class="linenr"> 7: </span>
+<span class="linenr"> 8: </span># ==== 1. ダミー時系列データを作る（sin波） ====
+<span class="linenr"> 9: </span>np.random.seed(0)
+<span class="linenr">10: </span>time = np.arange(0, 200, 0.1)
+<span class="linenr">11: </span>data = np.sin(time) + 0.1 * np.random.randn(len(time))  # sin波+ノイズ
+<span class="linenr">12: </span>
+<span class="linenr">13: </span>df = pd.DataFrame({"time": time, "value": data})
+<span class="linenr">14: </span>df.set_index("time", inplace=True)
+<span class="linenr">15: </span>
+<span class="linenr">16: </span># ==== 2. 学習・テスト分割 ====
+<span class="linenr">17: </span>train_size = int(len(df) * 0.8)
+<span class="linenr">18: </span>train_series = df.iloc[:train_size]["value"]
+<span class="linenr">19: </span>test_series = df.iloc[train_size:]["value"]
+<span class="linenr">20: </span>
+<span class="linenr">21: </span>SEQ_LEN = 20 ##この変数の意味？
+<span class="linenr">22: </span>
+<span class="linenr">23: </span>class TimeSeriesDataset(Dataset):
+<span class="linenr">24: </span>    def __init__(self, series, seq_len=20):
+<span class="linenr">25: </span>        self.series = torch.tensor(series.values, dtype=torch.float32)
+<span class="linenr">26: </span>        self.seq_len = seq_len
+<span class="linenr">27: </span>
+<span class="linenr">28: </span>    def __len__(self):
+<span class="linenr">29: </span>        return len(self.series) - self.seq_len
+<span class="linenr">30: </span>
+<span class="linenr">31: </span>    def __getitem__(self, idx):
+<span class="linenr">32: </span>        x = self.series[idx:idx+self.seq_len].unsqueeze(-1)  # (seq_len,1)
+<span class="linenr">33: </span>        y = self.series[idx+self.seq_len]
+<span class="linenr">34: </span>        return x, y
+<span class="linenr">35: </span>
+<span class="linenr">36: </span>train_dataset = TimeSeriesDataset(train_series, SEQ_LEN)
+<span class="linenr">37: </span>test_dataset = TimeSeriesDataset(test_series, SEQ_LEN)
+<span class="linenr">38: </span>
+<span class="linenr">39: </span>train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
+<span class="linenr">40: </span>
+<span class="linenr">41: </span># ==== 3. LSTMモデル定義 ====
+<span class="linenr">42: </span>class LSTMModel(nn.Module):
+<span class="linenr">43: </span>    def __init__(self, input_size=1, hidden_size=50, num_layers=1):
+<span class="linenr">44: </span>        super().__init__()
+<span class="linenr">45: </span>        self.lstm = nn.LSTM(input_size, hidden_size, num_layers,
+<span class="linenr">46: </span>                            batch_first=True ###ここに注意
+<span class="linenr">47: </span>                            )
+<span class="linenr">48: </span>        self.fc = nn.Linear(hidden_size, 1)  ###ここの意味は？
+<span class="linenr">49: </span>
+<span class="linenr">50: </span>    def forward(self, x):
+<span class="linenr">51: </span>        out, _ = self.lstm(x)
+<span class="linenr">52: </span>        out = out[:, -1, :]   # 最後の時点だけ出力する
+<span class="linenr">53: </span>        out = self.fc(out)
+<span class="linenr">54: </span>        return out.squeeze()
+<span class="linenr">55: </span>
+<span class="linenr">56: </span>model = LSTMModel()
+<span class="linenr">57: </span>criterion = nn.MSELoss()
+<span class="linenr">58: </span>optimizer = torch.optim.Adam(model.parameters(), lr=0.01) ##Adamになっているのに注意
+<span class="linenr">59: </span>
+<span class="linenr">60: </span># ==== 4. 学習 ====
+<span class="linenr">61: </span>EPOCHS = 10
+<span class="linenr">62: </span>for epoch in range(EPOCHS):
+<span class="linenr">63: </span>    for x, y in train_loader:
+<span class="linenr">64: </span>        optimizer.zero_grad()
+<span class="linenr">65: </span>        pred = model(x)
+<span class="linenr">66: </span>        loss = criterion(pred, y)
+<span class="linenr">67: </span>        loss.backward()
+<span class="linenr">68: </span>        optimizer.step()
+<span class="linenr">69: </span>    print(f"Epoch {epoch+1}/{EPOCHS}, Loss: {loss.item():.4f}")
+<span class="linenr">70: </span>
+<span class="linenr">71: </span># ==== 5. テストデータで予測 ====
+<span class="linenr">72: </span>model.eval() #ここも注意
+<span class="linenr">73: </span>preds = []
+<span class="linenr">74: </span>with torch.no_grad(): #ここも注意
+<span class="linenr">75: </span>    for i in range(len(test_dataset)):
+<span class="linenr">76: </span>        x, _ = test_dataset[i]
+<span class="linenr">77: </span>        x = x.unsqueeze(0)  # (1, seq_len, 1)
+<span class="linenr">78: </span>        pred = model(x).item()
+<span class="linenr">79: </span>        preds.append(pred)
+<span class="linenr">80: </span>
+<span class="linenr">81: </span># ==== 6. グラフ表示 ====
+<span class="linenr">82: </span>plt.figure(figsize=(12,6))
+<span class="linenr">83: </span>plt.plot(test_series.index[SEQ_LEN:], test_series.values[SEQ_LEN:], label="True", color="blue")
+<span class="linenr">84: </span>plt.plot(test_series.index[SEQ_LEN:], preds, label="Predicted", color="red")
+<span class="linenr">85: </span>plt.title("LSTM Prediction vs True values")
+<span class="linenr">86: </span>plt.xlabel("Time")
+<span class="linenr">87: </span>plt.ylabel("Value")
+<span class="linenr">88: </span>plt.legend()
+<span class="linenr">89: </span>plt.show()
+</pre>
+</div>
+
+
+<ul class="org-ul">
+<li><a href="https://ja.wikipedia.org/wiki/%E9%95%B7%E3%83%BB%E7%9F%AD%E6%9C%9F%E8%A8%98%E6%86%B6">LSTMとは</a></li>
+
+<li><a href="https://docs.pytorch.org/docs/stable/generated/torch.nn.LSTM.html">LSTMのpytochのドキュメント</a></li>
+</ul>
+</div>
+</div>
+
+
+
+<div id="outline-container-org2bcba51" class="outline-2">
+<h2 id="org2bcba51"><span class="section-number-2">4.</span> googleトレンドをニューラルネットに学習させてみる</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+以下は日経225という単語のgoogleトレンドをニューラルネットに学生させる例。
+</p>
+
+<p>
+うまくいかない場合は
+</p>
+
+<p>
+<a href="trend.csv">trend.csv</a>
+</p>
+
+<p>
+をダウンロードして使うか、KEYWORDを違うものに変える。
+</p>
+
+<p>
+ナスダックの株価について同様のことを行う例もコメントアウトされているので、それも試してみる。
+</p>
+
+
+<p>
+<a href="dyn/examples/lstmtrand.py">dyn/examples/lstmtrand.py</a>
+</p>
+<div class="org-src-container">
+<pre class="src src-python"><span class="linenr">  1: </span>
+<span class="linenr">  2: </span># =========================
+<span class="linenr">  3: </span># 1) ライブラリ
+<span class="linenr">  4: </span># =========================
+<span class="linenr">  5: </span># pip3 install pytrends torch matplotlib pandas scikit-learn
+<span class="linenr">  6: </span>
+<span class="linenr">  7: </span>from pytrends.request import TrendReq
+<span class="linenr">  8: </span>import pandas as pd
+<span class="linenr">  9: </span>import numpy as np
+<span class="linenr"> 10: </span>import matplotlib.pyplot as plt
+<span class="linenr"> 11: </span>
+<span class="linenr"> 12: </span>import torch
+<span class="linenr"> 13: </span>import torch.nn as nn
+<span class="linenr"> 14: </span>from torch.utils.data import Dataset, DataLoader
+<span class="linenr"> 15: </span>from sklearn.preprocessing import StandardScaler
+<span class="linenr"> 16: </span>
+<span class="linenr"> 17: </span>
+<span class="linenr"> 18: </span>
+<span class="linenr"> 19: </span># =========================
+<span class="linenr"> 20: </span># 2) Googleトレンドからデータ取得
+<span class="linenr"> 21: </span># =========================
+<span class="linenr"> 22: </span>#KEYWORD = "Bitcoin"          # ←好きな単語に変更（日本語OK）
+<span class="linenr"> 23: </span>KEYWORD = "日経225"          # ←好きな単語に変更（日本語OK）
+<span class="linenr"> 24: </span>
+<span class="linenr"> 25: </span>GEO = "JP"                   # 地域（"JP","US",""=全世界 など）
+<span class="linenr"> 26: </span>TIMEFRAME = "today 5-y"      # 期間（例: "today 12-m", "today 5-y", "2019-01-01 2025-10-01"）
+<span class="linenr"> 27: </span>
+<span class="linenr"> 28: </span>pytrends = TrendReq(hl='ja-JP', tz=540)  # 日本時間
+<span class="linenr"> 29: </span>pytrends.build_payload([KEYWORD], timeframe=TIMEFRAME, geo=GEO)
+<span class="linenr"> 30: </span>df_trend = pytrends.interest_over_time()
+<span class="linenr"> 31: </span>
+<span class="linenr"> 32: </span>df_trend.to_csv('trend.csv')
+<span class="linenr"> 33: </span>
+<span class="linenr"> 34: </span>##### googleトレンドが反応ない場合はこれに切り替える
+<span class="linenr"> 35: </span>#df_trend=pd.read_csv('trend.csv', index_col=0)
+<span class="linenr"> 36: </span>#df_trend.index=pd.to_datetime(df_trend.index)
+<span class="linenr"> 37: </span>
+<span class="linenr"> 38: </span># 取得結果の整形
+<span class="linenr"> 39: </span>if df_trend.empty:
+<span class="linenr"> 40: </span>    raise ValueError("Googleトレンドからデータが取得できませんでした。キーワード/期間/地域を見直してください。")
+<span class="linenr"> 41: </span>
+<span class="linenr"> 42: </span># isPartial列を削除して、欠損を前方埋め
+<span class="linenr"> 43: </span>series = df_trend[KEYWORD].copy()
+<span class="linenr"> 44: </span>series = series.asfreq(series.index.inferred_freq) if series.index.inferred_freq else series
+<span class="linenr"> 45: </span>#print(series)
+<span class="linenr"> 46: </span>
+<span class="linenr"> 47: </span>
+<span class="linenr"> 48: </span>##### googleトレンドではなく株価も同様に処理できる
+<span class="linenr"> 49: </span>#import yfinance as yf
+<span class="linenr"> 50: </span>#ticked = yf.Ticker("^NDX")
+<span class="linenr"> 51: </span>###hist = ticked.history(period="100d",interval="1d")
+<span class="linenr"> 52: </span>#hist = ticked.history(period="max",interval="1d")
+<span class="linenr"> 53: </span>#series=hist['Close']
+<span class="linenr"> 54: </span>##print(series)
+<span class="linenr"> 55: </span>
+<span class="linenr"> 56: </span>
+<span class="linenr"> 57: </span>series = series.ffill()
+<span class="linenr"> 58: </span>series.name = "value"
+<span class="linenr"> 59: </span>
+<span class="linenr"> 60: </span>
+<span class="linenr"> 61: </span># =========================
+<span class="linenr"> 62: </span># 3) 前処理（標準化＆学習/テスト分割）
+<span class="linenr"> 63: </span># =========================
+<span class="linenr"> 64: </span># 学習80% / テスト20%
+<span class="linenr"> 65: </span>n = len(series)
+<span class="linenr"> 66: </span>train_size = int(n * 0.8)
+<span class="linenr"> 67: </span>train_idx_end = train_size
+<span class="linenr"> 68: </span>
+<span class="linenr"> 69: </span>train_series = series.iloc[:train_idx_end]
+<span class="linenr"> 70: </span>test_series  = series.iloc[train_idx_end:]
+<span class="linenr"> 71: </span>
+<span class="linenr"> 72: </span>#print(train_series.shape)
+<span class="linenr"> 73: </span>#print(test_series.shape)
+<span class="linenr"> 74: </span>
+<span class="linenr"> 75: </span>
+<span class="linenr"> 76: </span># 標準化（学習データでfit → 両方にtransform）
+<span class="linenr"> 77: </span>scaler = StandardScaler()
+<span class="linenr"> 78: </span>train_vals = scaler.fit_transform(train_series.values.reshape(-1, 1)).flatten()
+<span class="linenr"> 79: </span>test_vals  = scaler.transform(test_series.values.reshape(-1, 1)).flatten()
+<span class="linenr"> 80: </span>
+<span class="linenr"> 81: </span># =========================
+<span class="linenr"> 82: </span># 4) PyTorch Dataset
+<span class="linenr"> 83: </span># =========================
+<span class="linenr"> 84: </span>SEQ_LEN = 24  # 1ステップ予測用の履歴長（週次なら~半年、日次なら約1ヶ月）
+<span class="linenr"> 85: </span>
+<span class="linenr"> 86: </span>#### 以前に使ったTimeSeriesDataset(Dataset)との違いに注目(やっていることはほぼ同じだけど、もし後で拡張しようとすると)
+<span class="linenr"> 87: </span>class SeqDataset(Dataset):
+<span class="linenr"> 88: </span>    def __init__(self, arr, seq_len=24):
+<span class="linenr"> 89: </span>        self.x = []
+<span class="linenr"> 90: </span>        self.y = []
+<span class="linenr"> 91: </span>        for i in range(len(arr) - seq_len):
+<span class="linenr"> 92: </span>            self.x.append(arr[i:i+seq_len])
+<span class="linenr"> 93: </span>            self.y.append(arr[i+seq_len])
+<span class="linenr"> 94: </span>        self.x = torch.tensor(np.array(self.x), dtype=torch.float32).unsqueeze(-1) # (N, seq_len, 1)
+<span class="linenr"> 95: </span>        self.y = torch.tensor(np.array(self.y), dtype=torch.float32)               # (N,)
+<span class="linenr"> 96: </span>
+<span class="linenr"> 97: </span>    def __len__(self):
+<span class="linenr"> 98: </span>        return len(self.y)
+<span class="linenr"> 99: </span>
+<span class="linenr">100: </span>    def __getitem__(self, idx):
+<span class="linenr">101: </span>        return self.x[idx], self.y[idx]
+<span class="linenr">102: </span>
+<span class="linenr">103: </span>train_ds = SeqDataset(train_vals, SEQ_LEN)
+<span class="linenr">104: </span>test_ds  = SeqDataset(test_vals,  SEQ_LEN)
+<span class="linenr">105: </span>
+<span class="linenr">106: </span>train_loader = DataLoader(train_ds, batch_size=32, shuffle=True)
+<span class="linenr">107: </span>
+<span class="linenr">108: </span>##ここは以前と同じ
+<span class="linenr">109: </span>class LSTMModel(nn.Module): 
+<span class="linenr">110: </span>    def __init__(self, input_size=1, hidden_size=50, num_layers=1):
+<span class="linenr">111: </span>        super().__init__()
+<span class="linenr">112: </span>        self.lstm = nn.LSTM(input_size, hidden_size, num_layers,
+<span class="linenr">113: </span>                            batch_first=True ###ここに注意
+<span class="linenr">114: </span>                            )
+<span class="linenr">115: </span>        self.fc = nn.Linear(hidden_size, 1)  ###ここの意味は？
+<span class="linenr">116: </span>    def forward(self, x):
+<span class="linenr">117: </span>        out, _ = self.lstm(x)  # (B, T, H)
+<span class="linenr">118: </span>        out = out[:, -1, :]   # 最後の時点だけ出力する
+<span class="linenr">119: </span>        out = self.fc(out)   # (B, 1)
+<span class="linenr">120: </span>        return out.squeeze() # (B,)
+<span class="linenr">121: </span>
+<span class="linenr">122: </span>
+<span class="linenr">123: </span>
+<span class="linenr">124: </span>device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+<span class="linenr">125: </span>model = LSTMModel(hidden_size=64, num_layers=1).to(device)
+<span class="linenr">126: </span>
+<span class="linenr">127: </span>criterion = nn.MSELoss()
+<span class="linenr">128: </span>optimizer = torch.optim.Adam(model.parameters(), lr=1e-3) ##Adamになっているのに注意
+<span class="linenr">129: </span>
+<span class="linenr">130: </span># =========================
+<span class="linenr">131: </span># 6) 学習
+<span class="linenr">132: </span># =========================
+<span class="linenr">133: </span>EPOCHS = 15
+<span class="linenr">134: </span>model.train()
+<span class="linenr">135: </span>for epoch in range(EPOCHS):
+<span class="linenr">136: </span>    epoch_loss = 0.0
+<span class="linenr">137: </span>    for x, y in train_loader:
+<span class="linenr">138: </span>        x = x.to(device)
+<span class="linenr">139: </span>        y = y.to(device)
+<span class="linenr">140: </span>
+<span class="linenr">141: </span>        optimizer.zero_grad()
+<span class="linenr">142: </span>        pred = model(x)
+<span class="linenr">143: </span>        loss = criterion(pred, y)
+<span class="linenr">144: </span>        loss.backward()
+<span class="linenr">145: </span>        optimizer.step()
+<span class="linenr">146: </span>        epoch_loss += loss.item() * x.size(0)
+<span class="linenr">147: </span>
+<span class="linenr">148: </span>    print(f"Epoch {epoch+1}/{EPOCHS}  loss={epoch_loss/len(train_ds):.4f}")
+<span class="linenr">149: </span>
+<span class="linenr">150: </span># =========================
+<span class="linenr">151: </span># 7) テストデータで 1ステップ予測
+<span class="linenr">152: </span># =========================
+<span class="linenr">153: </span>model.eval()
+<span class="linenr">154: </span>pred_scaled = []
+<span class="linenr">155: </span>with torch.no_grad():
+<span class="linenr">156: </span>    for i in range(len(test_ds)):
+<span class="linenr">157: </span>        x, _ = test_ds[i]
+<span class="linenr">158: </span>        x = x.unsqueeze(0).to(device)  # (1, T, 1)
+<span class="linenr">159: </span>        yhat = model(x).cpu().item()
+<span class="linenr">160: </span>        pred_scaled.append(yhat)
+<span class="linenr">161: </span>
+<span class="linenr">162: </span># 逆標準化（スカラーに対して inverse_transform を使えるように2次元化）
+<span class="linenr">163: </span>pred_scaled_arr = np.array(pred_scaled).reshape(-1, 1)
+<span class="linenr">164: </span>pred_inv = scaler.inverse_transform(pred_scaled_arr).flatten()
+<span class="linenr">165: </span>
+<span class="linenr">166: </span>
+<span class="linenr">167: </span># 真値（テスト部分のうち、SEQ_LEN 以降が予測対象）
+<span class="linenr">168: </span>true_inv = test_series.values[SEQ_LEN:]
+<span class="linenr">169: </span>
+<span class="linenr">170: </span># 対応するインデックス
+<span class="linenr">171: </span>plot_index = test_series.index[SEQ_LEN:]
+<span class="linenr">172: </span>
+<span class="linenr">173: </span># =========================
+<span class="linenr">174: </span># 8) プロット（真値 vs 予測）
+<span class="linenr">175: </span># =========================
+<span class="linenr">176: </span>plt.figure(figsize=(12, 6))
+<span class="linenr">177: </span>plt.plot(plot_index, true_inv, label="True")
+<span class="linenr">178: </span>plt.plot(plot_index, pred_inv, label="Predicted")
+<span class="linenr">179: </span>plt.title(f"Google Trends: {KEYWORD}  — LSTM Prediction vs True")
+<span class="linenr">180: </span>plt.xlabel("Date")
+<span class="linenr">181: </span>plt.ylabel("Trend index (0–100)")
+<span class="linenr">182: </span>plt.legend()
+<span class="linenr">183: </span>plt.tight_layout()
+<span class="linenr">184: </span>plt.show()
+<span class="linenr">185: </span>
+<span class="linenr">186: </span># =========================
+<span class="linenr">187: </span># 9)（おまけ）数ステップ先の再帰予測（テスト末尾から先へ）
+<span class="linenr">188: </span># =========================
+<span class="linenr">189: </span># 直近の実データ（学習+テストの最後のSEQ_LEN点）を使って、kステップ先まで再帰的に予測
+<span class="linenr">190: </span>K_STEPS = 12
+<span class="linenr">191: </span>hist_full = scaler.transform(series.values.reshape(-1,1)).flatten()
+<span class="linenr">192: </span>window = hist_full[-SEQ_LEN:].copy()
+<span class="linenr">193: </span>
+<span class="linenr">194: </span>future_scaled = []
+<span class="linenr">195: </span>model.eval()
+<span class="linenr">196: </span>with torch.no_grad():
+<span class="linenr">197: </span>    for _ in range(K_STEPS):
+<span class="linenr">198: </span>        xin = torch.tensor(window, dtype=torch.float32).view(1, SEQ_LEN, 1).to(device)
+<span class="linenr">199: </span>        yhat = model(xin).cpu().item()
+<span class="linenr">200: </span>        future_scaled.append(yhat)
+<span class="linenr">201: </span>        # 窓を1つ進める
+<span class="linenr">202: </span>        window = np.concatenate([window[1:], [yhat]])
+<span class="linenr">203: </span>
+<span class="linenr">204: </span>future = scaler.inverse_transform(np.array(future_scaled).reshape(-1,1)).flatten()
+<span class="linenr">205: </span>future_index = pd.date_range(series.index[-1], periods=K_STEPS+1, freq=series.index.inferred_freq)[1:]
+<span class="linenr">206: </span>
+<span class="linenr">207: </span>plt.figure(figsize=(12, 4))
+<span class="linenr">208: </span>plt.plot(series.index[-100:], series.values[-100:], label="History (last 100)")
+<span class="linenr">209: </span>plt.plot(future_index, future, label=f"Recursive forecast (+{K_STEPS})")
+<span class="linenr">210: </span>plt.title(f"Google Trends: {KEYWORD} — Recursive Forecast")
+<span class="linenr">211: </span>plt.xlabel("Date")
+<span class="linenr">212: </span>plt.ylabel("Trend index (0–100)")
+<span class="linenr">213: </span>plt.legend()
+<span class="linenr">214: </span>plt.tight_layout()
+<span class="linenr">215: </span>plt.show()
+<span class="linenr">216: </span>
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-org7e19a6c" class="outline-2">
+<h2 id="org7e19a6c"><span class="section-number-2">5.</span> ラグ特徴のコピー現象</h2>
+<div class="outline-text-2" id="text-5">
+<p>
+強い自己相関を持つ時系列を単純な全結合ニューラルネットで学習すると，
+前回値をそのままコピーするような予測をしてしまう。
+</p>
+
+
+<div id="org2cd3d90" class="figure">
+<p><img src="copy_effect_diagram.png" alt="copy_effect_diagram.png" width="80%" />
+</p>
+<p><span class="figure-number">&#22259;2:  </span>単純なラグ特徴を単純なNNが「コピー」してしまう仕組み</p>
+</div>
+</div>
+</div>
+
+
+
+
+
+<div id="outline-container-orgffe02f8" class="outline-2">
+<h2 id="orgffe02f8"><span class="section-number-2">6.</span> 演習</h2>
+<div class="outline-text-2" id="text-6">
+<ul class="org-ul">
+<li>適当なpandasで保存したデータをファイルに保存して、再度ファイルから読み込んで同じデータが入っているか確認せよ（ヒント <a href="https://note.nkmk.me/python-pandas-to-pickle-read-pickle/">https://note.nkmk.me/python-pandas-to-pickle-read-pickle/</a> ）。</li>
+<li>自分が興味ある単語のgoogleトレンドを学習させてみよう</li>
+<li>「kステップ先まで再帰的に予測」の部分で再帰的な計算がなぜ必要なのか考察せよ</li>
+<li>学習したニューラルネットワークをファイルに保存して、再度ファイルから読み込んで、同じ予測結果となることを確認せよ(ヒント state_dict の保存について調べよ <a href="https://docs.pytorch.org/tutorials/beginner/saving_loading_models.html">https://docs.pytorch.org/tutorials/beginner/saving_loading_models.html</a> )。</li>
+</ul>
+</div>
+</div>
+
+
+<div id="outline-container-org929da27" class="outline-2">
+<h2 id="org929da27"><span class="section-number-2">7.</span> 課題</h2>
+<div class="outline-text-2" id="text-7">
+<ul class="org-ul">
+<li>LSTMの数式を良く見て input_size=1, hidden_size=50, num_layers=1 がどれでに対応しているのか理解せよ。</li>
+<li>df_trend は一日ごとにデータがまとめられているが、一週間ごとのデータに変換してみよ</li>
+<li>複数の単語のgoogleトレンドを学習させてみよう。例えば「高専」「大学」の２つのトレンドから「高専」のトレンドを予測させる。</li>
+<li>複数の入力があるLSTMが、どれをを重視しているのか調べてみよう。例えば「高専」「大学」の２つのトレンドから「高専」のトレンドを予測させる場合に、どちらからの入力が重要とみなされているか？学習したニューラルネットの重みを見ればわかるはずだが、この重みを取り出すプログラムはどう作る？(ヒント)</li>
+</ul>
+</div>
+</div>
+
+
+
+
+<div id="outline-container-org2540643" class="outline-2">
+<h2 id="org2540643"><span class="section-number-2">8.</span> 発展課題</h2>
+<div class="outline-text-2" id="text-8">
+<ul class="org-ul">
+<li><a href="https://docs.pytorch.org/docs/stable/generated/torch.nn.LSTM.html">LSTMのpytochのドキュメント</a> を見るとLSTM以外にもGRUや、RNNなど様々なユニットがが見える。これらについて調べて、実際にユニットを組み合わせて動かしてみよう。</li>
+
+<li><a href="https://docs.pytorch.org/docs/stable/generated/torch.nn.Transformer.html">Transformer</a> というユニットはChatGPTのメインとなる構成部品となっている。これについて調べてよ。実際に動かしてみよう。LSTMなどと組み合わせた構成も試してみよ。</li>
+
+<li>様々な株の15分足  <a href="http://10.133.2.200/ai/out.csv.zip">http://10.133.2.200/ai/out.csv.zip</a>  を使って、ナスダック100が翌日に値上がりするか値下がりするか予想するプログラムをLSTMを使って作成せよ。</li>
+</ul>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="author">&#33879;&#32773;: Hirotaka Niitsuma</p>
+<p class="email">Email: <a href="mailto:hirotakaniitsuma@omu.ac.jp">hirotakaniitsuma@omu.ac.jp</a></p>
+<p class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 29.1 (<a href="https://orgmode.org">Org</a> mode 9.6.6)</p>
+<p class="validation"><a href="https://validator.w3.org/check?uri=referer">Validate</a></p>
+</div>
+</body>
+</html>

@@ -1,0 +1,648 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="ja" xml:lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>pytorch 入門</title>
+<meta name="author" content="Hirotaka Niitsuma" />
+<meta name="generator" content="Org Mode" />
+<style>
+  #content { max-width: 60em; margin: auto; }
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #e6e6e6;
+    border-radius: 3px;
+    background-color: #f2f2f2;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: auto;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    top: -8px;
+    right: 12px;
+    padding: 3px;
+    color: #555;
+    background-color: #f2f2f299;
+  }
+  pre.src:hover:before { display: inline; margin-top: 14px;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-authinfo::before { content: 'Authinfo'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { }
+</style>
+<link rel="stylesheet" type="text/css" href="pub/css/text.css" /><script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+</head>
+<body>
+<div id="org-div-home-and-up">
+ <a accesskey="h" href="index.html"> UP </a>
+ |
+ <a accesskey="H" href="index.html"> HOME </a>
+</div><div id="content" class="content">
+<h1 class="title">pytorch 入門</h1>
+<div id="table-of-contents" role="doc-toc">
+<h2>&#30446;&#27425;</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#org26c6236">1. python基本文法の確認</a></li>
+<li><a href="#orgf467865">2. FashionMNISTの学習</a></li>
+<li><a href="#orgf20090f">3. xor関数の学習</a></li>
+<li><a href="#org46c461d">4. 演習</a>
+<ul>
+<li><a href="#orga794efb">FashionMNISTのニューラルネットワークの精度を上げてみよう</a></li>
+<li><a href="#orga3ed4ab">XORのニューラルネットワークの精度を上げてみよう</a></li>
+<li><a href="#org26bb106">XORのニューラルネットワークを元にANDを学習するニューラルネットワークを作成してみよう</a></li>
+</ul>
+</li>
+<li><a href="#org5f4c195">5. 課題</a></li>
+<li><a href="#orgda56ead">6. 発展課題</a></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org26c6236" class="outline-2">
+<h2 id="org26c6236"><span class="section-number-2">1.</span> python基本文法の確認</h2>
+<div class="outline-text-2" id="text-1">
+<div class="org-src-container">
+<pre class="src src-python"><span class="linenr">1: </span>print(list(range(4)))
+<span class="linenr">2: </span>&gt;[0, 1, 2, 3]
+</pre>
+</div>
+
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="linenr">1: </span>import numpy as np
+<span class="linenr">2: </span>a=np.array([[1,2,3],[4,5,6]])
+<span class="linenr">3: </span>print(a.shape)
+<span class="linenr">4: </span>&gt;(2,3)
+<span class="linenr">5: </span>print(a[1,0])
+<span class="linenr">6: </span>&gt;4
+</pre>
+</div>
+</div>
+</div>
+
+
+
+<div id="outline-container-orgf467865" class="outline-2">
+<h2 id="orgf467865"><span class="section-number-2">2.</span> FashionMNISTの学習</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+<a href="https://colab.research.google.com/github/YutaroOgawa/pytorch_tutorials_jp/blob/main/notebook/0_Learn%20the%20Basics/0_8_quickstart_tutorial_jp.ipynb">PyTorch入門 8. クイックスタート</a>
+の例を途中の変数の状態を確認しながらgoogle colabなどのpythonが実行可能な環境で実行してみよう
+</p>
+
+<p>
+<a href="dyn/examples/fashionmnisit1.py">dyn/examples/fashionmnisit1.py</a>
+</p>
+<div class="org-src-container">
+<pre class="src src-python"><span class="linenr">  1: </span>
+<span class="linenr">  2: </span>import torch
+<span class="linenr">  3: </span>from torch import nn
+<span class="linenr">  4: </span>from torch.utils.data import DataLoader
+<span class="linenr">  5: </span>from torchvision import datasets
+<span class="linenr">  6: </span>from torchvision.transforms import ToTensor, Lambda, Compose
+<span class="linenr">  7: </span>import matplotlib.pyplot as plt
+<span class="linenr">  8: </span>
+<span class="linenr">  9: </span>
+<span class="linenr"> 10: </span># 訓練データをdatasetsからダウンロードa
+<span class="linenr"> 11: </span>training_data = datasets.FashionMNIST(
+<span class="linenr"> 12: </span>      root="data",
+<span class="linenr"> 13: </span>      train=True,
+<span class="linenr"> 14: </span>      download=True,
+<span class="linenr"> 15: </span>      transform=ToTensor(),
+<span class="linenr"> 16: </span>  )
+<span class="linenr"> 17: </span>
+<span class="linenr"> 18: </span># テストデータをdatasetsからダウンロード
+<span class="linenr"> 19: </span>test_data = datasets.FashionMNIST(
+<span class="linenr"> 20: </span>      root="data",
+<span class="linenr"> 21: </span>      train=False,
+<span class="linenr"> 22: </span>      download=True,
+<span class="linenr"> 23: </span>      transform=ToTensor(),
+<span class="linenr"> 24: </span>  )
+<span class="linenr"> 25: </span>
+<span class="linenr"> 26: </span>
+<span class="linenr"> 27: </span>### データの中身を確認してみよう
+<span class="linenr"> 28: </span>
+<span class="linenr"> 29: </span>#print(len(training_data))
+<span class="linenr"> 30: </span>#print(len(test_data))
+<span class="linenr"> 31: </span>#print(training_data[0][0].shape)
+<span class="linenr"> 32: </span>
+<span class="linenr"> 33: </span>#training_data[0][0][0][14][14]
+<span class="linenr"> 34: </span>#test_data[10]
+<span class="linenr"> 35: </span>#test_data[0][1]
+<span class="linenr"> 36: </span>
+<span class="linenr"> 37: </span>#plt.imshow(training_data[30000][0][0],cmap="gray")
+<span class="linenr"> 38: </span>#print(training_data[30000][1])
+<span class="linenr"> 39: </span>
+<span class="linenr"> 40: </span>
+<span class="linenr"> 41: </span>
+<span class="linenr"> 42: </span>
+<span class="linenr"> 43: </span>
+<span class="linenr"> 44: </span>
+<span class="linenr"> 45: </span>batch_size = 64
+<span class="linenr"> 46: </span>
+<span class="linenr"> 47: </span># データローダーの作成
+<span class="linenr"> 48: </span>train_dataloader = DataLoader(training_data, batch_size=batch_size)
+<span class="linenr"> 49: </span>test_dataloader = DataLoader(test_data, batch_size=batch_size)
+<span class="linenr"> 50: </span>
+<span class="linenr"> 51: </span>for X, y in test_dataloader:
+<span class="linenr"> 52: </span>    print("Shape of X [N, C, H, W]: ", X.shape)
+<span class="linenr"> 53: </span>    print("Shape of y: ", y.shape, y.dtype)
+<span class="linenr"> 54: </span>
+<span class="linenr"> 55: </span>    #最初の１つのデータだけ表示してデータローダーの動作を確認してみる
+<span class="linenr"> 56: </span>    break
+<span class="linenr"> 57: </span>
+<span class="linenr"> 58: </span>
+<span class="linenr"> 59: </span>
+<span class="linenr"> 60: </span>## google colab の無料プランではcpuしか使えない
+<span class="linenr"> 61: </span>device = "cuda" if torch.cuda.is_available() else "cpu"
+<span class="linenr"> 62: </span>print("Using {} device".format(device))
+<span class="linenr"> 63: </span>
+<span class="linenr"> 64: </span>
+<span class="linenr"> 65: </span># modelを定義します
+<span class="linenr"> 66: </span>class NeuralNetwork(nn.Module):
+<span class="linenr"> 67: </span>    def __init__(self):
+<span class="linenr"> 68: </span>        super(NeuralNetwork, self).__init__()
+<span class="linenr"> 69: </span>        self.flatten = nn.Flatten()
+<span class="linenr"> 70: </span>        self.linear_relu_stack = nn.Sequential(
+<span class="linenr"> 71: </span>            nn.Linear(28*28, 512),
+<span class="linenr"> 72: </span>            nn.ReLU(),
+<span class="linenr"> 73: </span>            #nn.Linear(512, 512),  #ここをコメントアウトしない場合に精度は上がる？
+<span class="linenr"> 74: </span>            #nn.ReLU(),           
+<span class="linenr"> 75: </span>            nn.Linear(512, 10),
+<span class="linenr"> 76: </span>            nn.ReLU()
+<span class="linenr"> 77: </span>        )
+<span class="linenr"> 78: </span>
+<span class="linenr"> 79: </span>    def forward(self, x):
+<span class="linenr"> 80: </span>        x = self.flatten(x)
+<span class="linenr"> 81: </span>        logits = self.linear_relu_stack(x)
+<span class="linenr"> 82: </span>        return logits
+<span class="linenr"> 83: </span>
+<span class="linenr"> 84: </span>
+<span class="linenr"> 85: </span>model = NeuralNetwork().to(device)
+<span class="linenr"> 86: </span>#model = NeuralNetwork()
+<span class="linenr"> 87: </span>
+<span class="linenr"> 88: </span>## どんなニューラルネットワークか確認してみよう
+<span class="linenr"> 89: </span>#print(model)
+<span class="linenr"> 90: </span>
+<span class="linenr"> 91: </span># 初期状態ではニューラルネットワークのパラメータは乱数だが、適当な画像を入力してみよう
+<span class="linenr"> 92: </span>
+<span class="linenr"> 93: </span>#乱数の3x4行列を生成してみる例
+<span class="linenr"> 94: </span>torch.rand((3,4))
+<span class="linenr"> 95: </span>
+<span class="linenr"> 96: </span># 乱数の1x28x28行列をニューラルネットワークに入力してみてどんな出力になるか確認してみよう
+<span class="linenr"> 97: </span>print(model(torch.rand((1,28,28)).to(device)))
+<span class="linenr"> 98: </span># こんな感じの１０次元ベクトルになる
+<span class="linenr"> 99: </span>##tensor([[0.0000, 0.0371, 0.0000, 0.0000, 0.0000, 0.0914, 0.0466, 0.0678, 0.0229,0.1512]], grad_fn=&lt;ReluBackward0&gt;)
+<span class="linenr">100: </span>
+<span class="linenr">101: </span>
+<span class="linenr">102: </span>loss_fn = nn.CrossEntropyLoss() #どんな誤差を小さくしたいか定義する
+<span class="linenr">103: </span>optimizer = torch.optim.SGD(model.parameters(), lr=1e-3) #どんな勾配法を実行するか選択する
+<span class="linenr">104: </span>
+<span class="linenr">105: </span>def train(dataloader, model, loss_fn, optimizer):
+<span class="linenr">106: </span>    size = len(dataloader.dataset)
+<span class="linenr">107: </span>    for batch, (X, y) in enumerate(dataloader):
+<span class="linenr">108: </span>        X, y = X.to(device), y.to(device)
+<span class="linenr">109: </span>
+<span class="linenr">110: </span>        # 損失誤差を計算
+<span class="linenr">111: </span>        pred = model(X)
+<span class="linenr">112: </span>        loss = loss_fn(pred, y)
+<span class="linenr">113: </span>
+<span class="linenr">114: </span>        # バックプロパゲーション
+<span class="linenr">115: </span>        optimizer.zero_grad()
+<span class="linenr">116: </span>        loss.backward()
+<span class="linenr">117: </span>        optimizer.step()  #勾配法を実行
+<span class="linenr">118: </span>
+<span class="linenr">119: </span>        if batch % 100 == 0:  	# 100回に一回のデバックプリント
+<span class="linenr">120: </span>            loss, current = loss.item(), batch * len(X)
+<span class="linenr">121: </span>            print(f"loss: {loss:&gt;7f}  [{current:&gt;5d}/{size:&gt;5d}]")
+<span class="linenr">122: </span>
+<span class="linenr">123: </span>def test(dataloader, model):
+<span class="linenr">124: </span>    size = len(dataloader.dataset)
+<span class="linenr">125: </span>    model.eval()
+<span class="linenr">126: </span>    test_loss, correct = 0, 0
+<span class="linenr">127: </span>    with torch.no_grad():
+<span class="linenr">128: </span>        for X, y in dataloader:
+<span class="linenr">129: </span>            X, y = X.to(device), y.to(device)
+<span class="linenr">130: </span>            pred = model(X)
+<span class="linenr">131: </span>            test_loss += loss_fn(pred, y).item()
+<span class="linenr">132: </span>            correct += (pred.argmax(1) == y).type(torch.float).sum().item()
+<span class="linenr">133: </span>    test_loss /= size
+<span class="linenr">134: </span>    correct /= size
+<span class="linenr">135: </span>    print(f"Test Error: \n Accuracy: {(100*correct):&gt;0.1f}%, Avg loss: {test_loss:&gt;8f} \n")
+<span class="linenr">136: </span>
+<span class="linenr">137: </span>
+<span class="linenr">138: </span>#epochs = 1
+<span class="linenr">139: </span>epochs = 10
+<span class="linenr">140: </span>for t in range(epochs):
+<span class="linenr">141: </span>    print(f"Epoch {t+1}\n-------------------------------")
+<span class="linenr">142: </span>    train(train_dataloader, model, loss_fn, optimizer)
+<span class="linenr">143: </span>    test(test_dataloader, model)
+<span class="linenr">144: </span>print("Done!")
+<span class="linenr">145: </span>
+<span class="linenr">146: </span>
+<span class="linenr">147: </span>#x=model(torch.tensor(training_data[30000][0]))
+<span class="linenr">148: </span>#print(x)
+<span class="linenr">149: </span>
+<span class="linenr">150: </span>x=model(torch.tensor(training_data[30000][0]).to(device))
+<span class="linenr">151: </span>print(x)
+<span class="linenr">152: </span>#tensor([[0.5800, 0.0000, 0.0000, 3.5463, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000]], device='cuda:0', grad_fn=&lt;ReluBackward0&gt;)
+<span class="linenr">153: </span>## 3番目の値が大きいので３番目の　Dress 	ドレス　と判定されている
+<span class="linenr">154: </span>
+<span class="linenr">155: </span>#y=x.to('cpu').detach().numpy().copy() 
+<span class="linenr">156: </span>#print(y)
+<span class="linenr">157: </span>plt.imshow(training_data[30000][0][0],cmap="gray")
+<span class="linenr">158: </span>plt.show()
+<span class="linenr">159: </span>
+</pre>
+</div>
+
+
+<p>
+<a href="https://colab.research.google.com/github/YutaroOgawa/pytorch_tutorials_jp/blob/main/notebook/0_Learn%20the%20Basics/0_1_tensors_tutorial_js.ipynb">pytorchにおける行列などの扱い方の解説</a>
+</p>
+
+
+<p>
+<a href="https://colab.research.google.com/github/YutaroOgawa/pytorch_tutorials_jp/blob/main/notebook/0_Learn%20the%20Basics/0_2_data_tutorial_jp.ipynb">データセットとデータローダーの詳細な解説</a>
+</p>
+</div>
+</div>
+
+
+
+<div id="outline-container-orgf20090f" class="outline-2">
+<h2 id="orgf20090f"><span class="section-number-2">3.</span> xor関数の学習</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+xor関数を学習する
+以下のコードをgoogle colabなどで実行してみよう
+</p>
+
+<p>
+<a href="dyn/examples/xor-torch.py">dyn/examples/xor-torch.py</a>
+</p>
+<div class="org-src-container">
+<pre class="src src-python"><span class="linenr"> 1: </span>
+<span class="linenr"> 2: </span>import torch
+<span class="linenr"> 3: </span>import torch.nn as nn
+<span class="linenr"> 4: </span>import torch.optim as optim
+<span class="linenr"> 5: </span>
+<span class="linenr"> 6: </span>class Net(nn.Module):
+<span class="linenr"> 7: </span>    def __init__(self):
+<span class="linenr"> 8: </span>        super(Net, self).__init__()
+<span class="linenr"> 9: </span>        self.fc1 = torch.nn.Linear(2, 16) #この数値を16から4にしたら精度は上がる？
+<span class="linenr">10: </span>        self.fc2 = torch.nn.Linear(16, 1)
+<span class="linenr">11: </span>        self.sigmoid = nn.Sigmoid()
+<span class="linenr">12: </span>
+<span class="linenr">13: </span>    def forward(self, x):
+<span class="linenr">14: </span>        x = torch.nn.functional.relu(self.fc1(x))
+<span class="linenr">15: </span>        x = self.fc2(x)
+<span class="linenr">16: </span>        x = self.sigmoid(x)
+<span class="linenr">17: </span>        return x
+<span class="linenr">18: </span>
+<span class="linenr">19: </span>def main():
+<span class="linenr">20: </span>
+<span class="linenr">21: </span>    import numpy as np
+<span class="linenr">22: </span>    x = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
+<span class="linenr">23: </span>    y = np.array([[0], [1], [1], [0]])
+<span class="linenr">24: </span>
+<span class="linenr">25: </span>    num_epochs = 10000
+<span class="linenr">26: </span>
+<span class="linenr">27: </span>    # convert numpy array to tensor
+<span class="linenr">28: </span>    x_tensor = torch.from_numpy(x).float()
+<span class="linenr">29: </span>    y_tensor = torch.from_numpy(y).float()
+<span class="linenr">30: </span>
+<span class="linenr">31: </span>    # crate instance
+<span class="linenr">32: </span>    net = Net()
+<span class="linenr">33: </span>
+<span class="linenr">34: </span>    # set training mode
+<span class="linenr">35: </span>    net.train()
+<span class="linenr">36: </span>
+<span class="linenr">37: </span>    # set training parameters
+<span class="linenr">38: </span>    optimizer = torch.optim.SGD(net.parameters(), lr=0.01)
+<span class="linenr">39: </span>    criterion = torch.nn.MSELoss()
+<span class="linenr">40: </span>
+<span class="linenr">41: </span>    # start to train
+<span class="linenr">42: </span>    epoch_loss = []
+<span class="linenr">43: </span>    for epoch in range(num_epochs):
+<span class="linenr">44: </span>        # forward
+<span class="linenr">45: </span>        outputs = net(x_tensor)
+<span class="linenr">46: </span>
+<span class="linenr">47: </span>        # calculate loss
+<span class="linenr">48: </span>        loss = criterion(outputs, y_tensor)
+<span class="linenr">49: </span>
+<span class="linenr">50: </span>        # update weights
+<span class="linenr">51: </span>        optimizer.zero_grad()
+<span class="linenr">52: </span>        loss.backward()
+<span class="linenr">53: </span>        optimizer.step()
+<span class="linenr">54: </span>
+<span class="linenr">55: </span>        # save loss of this epoch
+<span class="linenr">56: </span>        epoch_loss.append(loss.data.numpy().tolist())
+<span class="linenr">57: </span>
+<span class="linenr">58: </span>    print(net(torch.from_numpy(np.array([[0, 0]])).float()))  #tensor([[0.1525]], grad_fn=&lt;SigmoidBackward0&gt;)
+<span class="linenr">59: </span>    print(net(torch.from_numpy(np.array([[1, 0]])).float()))  #tensor([[0.7982]], grad_fn=&lt;SigmoidBackward0&gt;)
+<span class="linenr">60: </span>    print(net(torch.from_numpy(np.array([[0, 1]])).float()))  #tensor([[0.6603]], grad_fn=&lt;SigmoidBackward0&gt;)
+<span class="linenr">61: </span>    print(net(torch.from_numpy(np.array([[1, 1]])).float()))  #tensor([[0.3350]], grad_fn=&lt;SigmoidBackward0&gt;)
+<span class="linenr">62: </span>
+<span class="linenr">63: </span>if __name__ == "__main__":
+<span class="linenr">64: </span>    main()
+</pre>
+</div>
+</div>
+</div>
+
+
+
+<div id="outline-container-org46c461d" class="outline-2">
+<h2 id="org46c461d"><span class="section-number-2">4.</span> 演習</h2>
+<div class="outline-text-2" id="text-4">
+</div>
+<div id="outline-container-orga794efb" class="outline-3">
+<h3 id="orga794efb">FashionMNISTのニューラルネットワークの精度を上げてみよう</h3>
+</div>
+
+<div id="outline-container-orga3ed4ab" class="outline-3">
+<h3 id="orga3ed4ab">XORのニューラルネットワークの精度を上げてみよう</h3>
+</div>
+
+<div id="outline-container-org26bb106" class="outline-3">
+<h3 id="org26bb106">XORのニューラルネットワークを元にANDを学習するニューラルネットワークを作成してみよう</h3>
+</div>
+</div>
+
+
+
+<div id="outline-container-org5f4c195" class="outline-2">
+<h2 id="org5f4c195"><span class="section-number-2">5.</span> 課題</h2>
+<div class="outline-text-2" id="text-5">
+<p>
+以下はyahoo financeからナスダック100の株価の終値(ニューヨーク市場が閉まる日本時間でAM５：００の株価)の過去１００日分を取得するプログラムである。
+取得した日の翌日の株価の終値を予測するプログラムを作成せよ
+</p>
+
+<p>
+<a href="dyn/examples/yfinance-usage.py">dyn/examples/yfinance-usage.py</a>
+</p>
+<div class="org-src-container">
+<pre class="src src-python"><span class="linenr"> 1: </span>
+<span class="linenr"> 2: </span>!pip install yfinance 
+<span class="linenr"> 3: </span>
+<span class="linenr"> 4: </span>import yfinance as yf
+<span class="linenr"> 5: </span>
+<span class="linenr"> 6: </span>ticked = yf.Ticker("^NDX")
+<span class="linenr"> 7: </span>hist = ticked.history(period="100d",interval="1d")
+<span class="linenr"> 8: </span>
+<span class="linenr"> 9: </span>#print(hist) #ここをコメントアウトするとデータの詳細が見れる
+<span class="linenr">10: </span>
+<span class="linenr">11: </span>closes=hist['Close'].values #詳細データから必要なデータをlistで取り出した
+<span class="linenr">12: </span>
+<span class="linenr">13: </span>#print(closes)  #どんなデータか確認してみよう
+<span class="linenr">14: </span>
+</pre>
+</div>
+
+<p>
+ヒントのコード１
+</p>
+
+<p>
+今日の値段を予測するために３日前の値段p1,p2,p3を入力するなら
+以下のような配列を用意すれば良い
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="linenr"> 1: </span>ccc=closes
+<span class="linenr"> 2: </span>print(ccc)
+<span class="linenr"> 3: </span>X=[]
+<span class="linenr"> 4: </span>p1=ccc[0]
+<span class="linenr"> 5: </span>p2=ccc[1]
+<span class="linenr"> 6: </span>p3=ccc[2]
+<span class="linenr"> 7: </span>for p in ccc[3:]:
+<span class="linenr"> 8: </span>  X.append([p1,p2,p3])
+<span class="linenr"> 9: </span>  p1=p2
+<span class="linenr">10: </span>  p2=p3
+<span class="linenr">11: </span>  p3=p
+<span class="linenr">12: </span>print(X) #入力
+<span class="linenr">13: </span>y=ccc[4:]
+<span class="linenr">14: </span>print(y) #出力?
+</pre>
+</div>
+
+
+
+<p>
+ヒントのコード２
+</p>
+
+<p>
+画像を入力するニューラルネットワークを、３日分の値段を入力するように変える
+出力は１０個のクラスではなく、値段１つだけに変えれば良い
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="linenr"> 1: </span>class NeuralNetwork(nn.Module):
+<span class="linenr"> 2: </span>    def __init__(self):
+<span class="linenr"> 3: </span>        super(NeuralNetwork, self).__init__()
+<span class="linenr"> 4: </span>        self.linear_relu_stack = nn.Sequential(
+<span class="linenr"> 5: </span>            nn.Linear(3, 10),　#３日
+<span class="linenr"> 6: </span>            nn.ReLU(),
+<span class="linenr"> 7: </span>            nn.Linear(10, 10),
+<span class="linenr"> 8: </span>            nn.ReLU(),
+<span class="linenr"> 9: </span>            nn.Linear(10, 1),　#１日
+<span class="linenr">10: </span>            nn.ReLU()
+<span class="linenr">11: </span>        )
+<span class="linenr">12: </span>    def forward(self, x):
+<span class="linenr">13: </span>        ret = self.linear_relu_stack(x)
+<span class="linenr">14: </span>        return ret
+</pre>
+</div>
+</div>
+</div>
+
+
+
+<div id="outline-container-orgda56ead" class="outline-2">
+<h2 id="orgda56ead"><span class="section-number-2">6.</span> 発展課題</h2>
+<div class="outline-text-2" id="text-6">
+<ul class="org-ul">
+<li>optimizerについて調べよ。例えば <a href="https://rightcode.co.jp/blogs/17100">これ</a>  などはわかりやすい。 optimizerの種類やlr=1e-3という部分を変えるとどうなるか調べよ。</li>
+<li>時系列データ処理でウォークフォワード法が必要になる理由について調べよ</li>
+<li>ウォークフォワード法を使った場合の株価予測プログラムを作成せよ</li>
+<li>Close以外の値や、^NDX以外の値(USDJPY=Xなど)を入力にして複数入力のある株価予測プログラムを作成せよ</li>
+<li>誤差逆伝搬法の式を導出せよ（参考 <a href="https://qiita.com/43x2/items/50b55623c890564f1893">https://qiita.com/43x2/items/50b55623c890564f1893</a> )</li>
+<li>様々な株の15分足（15分ごとの値段変化）を次のファイルに用意した  <a href="http://10.133.2.200/ai/out.csv.zip">http://10.133.2.200/ai/out.csv.zip</a>  この様々な株価の情報を使って、ナスダック100(qqq_close)が翌日に値上がりするか値下がりするか予想せよ。ウォークフォワード法を使って性能を評価せよ。</li>
+</ul>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="author">&#33879;&#32773;: Hirotaka Niitsuma</p>
+<p class="email">Email: <a href="mailto:hirotakaniitsuma@omu.ac.jp">hirotakaniitsuma@omu.ac.jp</a></p>
+<p class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 29.1 (<a href="https://orgmode.org">Org</a> mode 9.6.6)</p>
+<p class="validation"><a href="https://validator.w3.org/check?uri=referer">Validate</a></p>
+</div>
+</body>
+</html>
